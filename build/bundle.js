@@ -42575,6 +42575,10 @@
 	    value: true
 	});
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 	var _three = __webpack_require__(1);
 
 	var THREE = _interopRequireWildcard(_three);
@@ -42595,7 +42599,7 @@
 
 
 	var shaderVert = "#define GLSLIFY 1\nvoid main() {\n  gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);\n}";
-	var shaderFrag = "#define GLSLIFY 1\n//\n// Description : Array and textureless GLSL 2D simplex noise function.\n//      Author : Ian McEwan, Ashima Arts.\n//  Maintainer : ijm\n//     Lastmod : 20110822 (ijm)\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\n//               Distributed under the MIT License. See LICENSE file.\n//               https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec2 mod289(vec2 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec3 permute(vec3 x) {\n  return mod289(((x*34.0)+1.0)*x);\n}\n\nfloat snoise(vec2 v)\n  {\n  const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0\n                      0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)\n                     -0.577350269189626,  // -1.0 + 2.0 * C.x\n                      0.024390243902439); // 1.0 / 41.0\n// First corner\n  vec2 i  = floor(v + dot(v, C.yy) );\n  vec2 x0 = v -   i + dot(i, C.xx);\n\n// Other corners\n  vec2 i1;\n  //i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0\n  //i1.y = 1.0 - i1.x;\n  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);\n  // x0 = x0 - 0.0 + 0.0 * C.xx ;\n  // x1 = x0 - i1 + 1.0 * C.xx ;\n  // x2 = x0 - 1.0 + 2.0 * C.xx ;\n  vec4 x12 = x0.xyxy + C.xxzz;\n  x12.xy -= i1;\n\n// Permutations\n  i = mod289(i); // Avoid truncation effects in permutation\n  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))\n    + i.x + vec3(0.0, i1.x, 1.0 ));\n\n  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);\n  m = m*m ;\n  m = m*m ;\n\n// Gradients: 41 points uniformly over a line, mapped onto a diamond.\n// The ring size 17*17 = 289 is close to a multiple of 41 (41*7 = 287)\n\n  vec3 x = 2.0 * fract(p * C.www) - 1.0;\n  vec3 h = abs(x) - 0.5;\n  vec3 ox = floor(x + 0.5);\n  vec3 a0 = x - ox;\n\n// Normalise gradients implicitly by scaling m\n// Approximation of: m *= inversesqrt( a0*a0 + h*h );\n  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );\n\n// Compute final noise value at P\n  vec3 g;\n  g.x  = a0.x  * x0.x  + h.x  * x0.y;\n  g.yz = a0.yz * x12.xz + h.yz * x12.yw;\n  return 130.0 * dot(m, g);\n}\n\nvoid main() {\n\n  float brightness = snoise(gl_FragCoord.xx);\n\n    //gl_FragColor = vec4(vec3(brightness), 1.0);\n    gl_FragColor = vec4(vec3(1.0,0.0,0.0), 0.0);\n\n}";
+	var shaderFrag = "#define GLSLIFY 1\n//\n// Description : Array and textureless GLSL 2D simplex noise function.\n//      Author : Ian McEwan, Ashima Arts.\n//  Maintainer : ijm\n//     Lastmod : 20110822 (ijm)\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\n//               Distributed under the MIT License. See LICENSE file.\n//               https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec2 mod289(vec2 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec3 permute(vec3 x) {\n  return mod289(((x*34.0)+1.0)*x);\n}\n\nfloat snoise(vec2 v)\n  {\n  const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0\n                      0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)\n                     -0.577350269189626,  // -1.0 + 2.0 * C.x\n                      0.024390243902439); // 1.0 / 41.0\n// First corner\n  vec2 i  = floor(v + dot(v, C.yy) );\n  vec2 x0 = v -   i + dot(i, C.xx);\n\n// Other corners\n  vec2 i1;\n  //i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0\n  //i1.y = 1.0 - i1.x;\n  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);\n  // x0 = x0 - 0.0 + 0.0 * C.xx ;\n  // x1 = x0 - i1 + 1.0 * C.xx ;\n  // x2 = x0 - 1.0 + 2.0 * C.xx ;\n  vec4 x12 = x0.xyxy + C.xxzz;\n  x12.xy -= i1;\n\n// Permutations\n  i = mod289(i); // Avoid truncation effects in permutation\n  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))\n    + i.x + vec3(0.0, i1.x, 1.0 ));\n\n  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);\n  m = m*m ;\n  m = m*m ;\n\n// Gradients: 41 points uniformly over a line, mapped onto a diamond.\n// The ring size 17*17 = 289 is close to a multiple of 41 (41*7 = 287)\n\n  vec3 x = 2.0 * fract(p * C.www) - 1.0;\n  vec3 h = abs(x) - 0.5;\n  vec3 ox = floor(x + 0.5);\n  vec3 a0 = x - ox;\n\n// Normalise gradients implicitly by scaling m\n// Approximation of: m *= inversesqrt( a0*a0 + h*h );\n  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );\n\n// Compute final noise value at P\n  vec3 g;\n  g.x  = a0.x  * x0.x  + h.x  * x0.y;\n  g.yz = a0.yz * x12.xz + h.yz * x12.yw;\n  return 130.0 * dot(m, g);\n}\n\nuniform float screenWidth;\nuniform float screenHeight;\n\nvoid main() {\n\n    float x = gl_FragCoord.x/screenWidth;\n    float y = gl_FragCoord.y/screenHeight;\n    float z = gl_FragCoord.z; // Already in range [0,1]\n    gl_FragColor = vec4(x*2.0,y*2.0, 0, 0.0);\n\n}\n";
 	var noiseMaterial = __webpack_require__(4);
 
 	var Main = function (_AbstractVRApplicatio) {
@@ -42604,28 +42608,88 @@
 	    function Main() {
 	        _classCallCheck(this, Main);
 
+	        // Add visual effects
 	        var _this = _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this));
 
-	        var texture = new THREE.TextureLoader().load('textures/crate.gif');
+	        _this.params = {
+	            usePostProcessing: true,
+	            useFXAA: true,
+	            useBlur: false,
+	            useBloom: true
+	        };
 
-	        var geometry = new THREE.BoxGeometry(200, 200, 200);
-	        var material = new THREE.MeshBasicMaterial({ map: texture });
+	        var light = new THREE.PointLight(0xFFFFFF, 1);
+	        light.position.copy(_this._camera.position);
+	        _this._scene.add(light);
 
-	        var material2 = new THREE.ShaderMaterial({
-	            vertexShader: shaderVert,
-	            fragmentShader: shaderFrag
-	        });
-	        _this._mesh = new THREE.Mesh(geometry, material2); //noiseMaterial );
-	        _this._mesh.position.set(0, 0, -300);
-	        //const mat1 = noiseMaterial();
-	        //this._mesh = new THREE.Mesh( geometry, mat1 );
+	        _this.material = new THREE.MeshPhongMaterial({ color: 0x3a9ceb });
+	        var c = void 0;
+	        for (var i = 0; i < 500; i++) {
+	            c = _this.addCube();
+	            _this.cubes.push(c);
+	            _this._scene.add(c);
+	        }
 
-	        _this._scene.add(_this._mesh);
+	        _this.initPostprocessing();
+	        _this.initGui();
 
 	        _this.animate();
 
 	        return _this;
 	    }
+
+	    _createClass(Main, [{
+	        key: 'addCube',
+	        value: function addCube() {
+	            var cube = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), this.material);
+	            cube.position.set(Math.random() * 600 - 300, Math.random() * 600 - 300, Math.random() * -500);
+	            cube.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+	            return cube;
+	        }
+	    }, {
+	        key: 'initPostprocessing',
+	        value: function initPostprocessing() {
+	            this._renderer.autoClearColor = true;
+	            this.composer = new WAGNER.Composer(this._renderer);
+	            this.fxaaPass = new FXAAPass();
+	            this.boxBlurPass = new BoxBlurPass(3, 3);
+	            this.bloomPass = new MultiPassBloomPass({
+	                blurAmount: 2,
+	                applyZoomBlur: true
+	            });
+	        }
+	    }, {
+	        key: 'initGui',
+	        value: function initGui() {
+	            var gui = new dat.GUI();
+	            gui.add(this.params, 'usePostProcessing');
+	            gui.add(this.params, 'useFXAA');
+	            gui.add(this.params, 'useBlur');
+	            gui.add(this.params, 'useBloom');
+	            return gui;
+	        }
+	    }, {
+	        key: 'animate',
+	        value: function animate() {
+	            _get(Main.prototype.__proto__ || Object.getPrototypeOf(Main.prototype), 'animate', this).call(this);
+
+	            for (var i = 0; i < this.cubes.length; i++) {
+	                this.cubes[i].rotation.y += 0.01 + (i - this.cubes.length) * 0.00001;
+	                this.cubes[i].rotation.x += 0.01 + (i - this.cubes.length) * 0.00001;
+	            }
+
+	            if (this.params.usePostProcessing) {
+	                this.composer.reset();
+	                this.composer.render(this._scene, this._camera);
+	                if (this.params.useFXAA) this.composer.pass(this.fxaaPass);
+	                if (this.params.useBlur) this.composer.pass(this.boxBlurPass);
+	                if (this.params.useBloom) this.composer.pass(this.bloomPass);
+	                this.composer.toScreen();
+	            } else {
+	                this._renderer.render(this._scene, this._camera);
+	            }
+	        }
+	    }]);
 
 	    return Main;
 	}(_AbstractVRApplication2.default);
@@ -42669,7 +42733,6 @@
 	        _classCallCheck(this, AbstractVRApplication);
 
 	        this._camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
-	        this._camera.position.z = 400;
 
 	        this._controls = new THREE.VRControls(this._camera);
 
@@ -42692,7 +42755,6 @@
 	    _createClass(AbstractVRApplication, [{
 	        key: 'onWindowResize',
 	        value: function onWindowResize() {
-
 	            this._camera.aspect = window.innerWidth / window.innerHeight;
 	            this._camera.updateProjectionMatrix();
 
@@ -42708,19 +42770,16 @@
 	    }, {
 	        key: 'renderer',
 	        get: function get() {
-
 	            return this._renderer;
 	        }
 	    }, {
 	        key: 'camera',
 	        get: function get() {
-
 	            return this._camera;
 	        }
 	    }, {
 	        key: 'scene',
 	        get: function get() {
-
 	            return this._scene;
 	        }
 	    }]);

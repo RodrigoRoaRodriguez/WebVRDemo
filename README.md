@@ -1,9 +1,9 @@
-three.js webpack
-glsl hot module replacement thanks to @mattdesl (https://github.com/mattdesl/webpack-three-hmr-test)
+# Sonar gh-pages
 
+## Setup
 
-## How to install
+In order to run the ThreeJS web-app you need to:
 
-* Run `npm install`
-* Run `npm start`
-* Open http://localhost:8080
+1. Go to the folder in the terminal and run `npm install`, _this installs dependencies_.
+2. Run `npm start`, _this starts a local webpack dev-server_
+3. Open your browser and go to <http://localhost:8080>
