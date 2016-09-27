@@ -6,7 +6,8 @@ import WebVRManager from 'webvr-boilerplate'
 
 class AbstractVRApplication{
     constructor(){
-        this._camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+      //PerspectiveCamera( fov, aspect, near, far )
+        this._camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 10, 1000 );
 
         this._controls = new THREE.VRControls( this._camera );
 
