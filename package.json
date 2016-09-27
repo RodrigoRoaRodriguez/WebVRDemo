@@ -1,6 +1,7 @@
 {
   "scripts": {
     "start": "webpack --config config/webpack.dev.js | webpack-dev-server --port 8080 --config config/webpack.dev.js --hot --history-api-fallback --progress --colors --inline --content-base ./build",
+    "test": "webpack --config config/webpack.dev.js | webpack-dev-server --host 0.0.0.0  --config config/webpack.dev.js --hot --history-api-fallback --progress --colors --inline --content-base ./build",
     "build": "webpack --config config/webpack.prod.js --progress --profile --colors"
   },
   "license": "WTFPL",

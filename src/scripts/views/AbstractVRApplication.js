@@ -7,13 +7,14 @@ import WebVRManager from 'webvr-boilerplate'
 class AbstractVRApplication{
     constructor(){
       //PerspectiveCamera( fov, aspect, near, far )
-        this._camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 10, 1000 );
+        this._camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 10, 1000 );
 
         this._controls = new THREE.VRControls( this._camera );
 
         this._scene = new THREE.Scene();
 
         this._renderer = new THREE.WebGLRenderer();
+        this._renderer.setClearColor( 0xffffff, 0)
         this._renderer.setPixelRatio( window.devicePixelRatio );
         this._renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( this._renderer.domElement );

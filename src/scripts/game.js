@@ -8,12 +8,37 @@ import FXAAPass from '@superguigui/wagner/src/passes/fxaa/FXAAPass'
 import ZoomBlurPassfrom from '@superguigui/wagner/src/passes/zoom-blur/ZoomBlurPass'
 import MultiPassBloomPass from '@superguigui/wagner/src/passes/bloom/MultiPassBloomPass'
 import _ from 'lodash'
+const glslify = require('glslify')
+const skyVert = glslify('./../shaders/sky.vert')
+const skyFrag = glslify('./../shaders/sky.frag')
 
 class Main extends AbstractVRApplication  {
 // class Main extends AbstractApplication {
 
     constructor() {
         super();
+        //Add sky-dome.
+        //TODO: Make a proper sky-box
+        var geometry = new THREE.SphereGeometry(900, 0,0);
+
+        var texture = new THREE.TextureLoader().load( 'textures/bg.jpg' );
+        var uniforms = {
+          texture: { type: 't', value: texture }
+        };
+
+        var material = new THREE.ShaderMaterial( {
+          uniforms:       uniforms,
+          vertexShader:   skyVert,
+          fragmentShader: skyFrag
+        })
+
+
+        let skyBox = new THREE.Mesh(geometry, material);
+        skyBox.scale.set(-1, 1, 1);
+        skyBox.eulerOrder = 'XZY';
+        skyBox.renderDepth = 1000.0;
+        this.scene.add(skyBox);
+
         this.cubes = [];
 
         this.params = {
@@ -23,28 +48,35 @@ class Main extends AbstractVRApplication  {
             useBloom: true
         };
 
-        const light = new THREE.PointLight(0xFFFFFF, 1);
-        light.position.copy(this._camera.position);
-        this._scene.add(light);
+        var lights = [
+          new THREE.AmbientLight( 0x202044 ), // soft white light
+          new THREE.PointLight(0xffdd88, 1),
+          new THREE.PointLight(0x88ccff, .5)
+        ]
+        lights[1].position.set(-500, 990, 0)
+        lights[2].position.set(500, 750, 0)
+
+        lights.forEach(light =>this._scene.add(light))
+
         //TODO: create 12 colored materials.
         this.materials = []
+
         for (var i = 0; i < 12; i++) {
-          this.materials.push(new THREE.MeshPhongMaterial({
-            color:new THREE.Color(`hsl(${30*i}, 90%, 65%)`),
-            // shading:THREE.FlatShading,
-            opacity: 0.5,
-            transparent: true,
-            shininess:500
-          }))
+          this.materials.push(new THREE.MeshLambertMaterial({
+                color:new THREE.Color(`hsl(${30*i}, 90%, 65%)`),
+                blending:THREE.AdditiveBlending,
+                opacity: 0.8,
+                transparent: true,
+              }))
         }
 
         let model;
-        for (let i = 0; i < 500; i++) {
+        for (let i = 0; i < 200; i++) {
             model = this.add3DModel();
             this.cubes.push(model);
-            this._scene.add(model);
+            this.scene.add(model);
         }
-        //model.position.set(0, 0, 50);
+
         this.initPostprocessing();
         // this.initGui();
 
@@ -54,27 +86,27 @@ class Main extends AbstractVRApplication  {
 
     add3DModel() {
       //TODO: Replace with low poly wine glasses
-        let geometry = new THREE.Mesh(new THREE.OctahedronGeometry(50,2), this.materials[_.random(12)]);
+        let geometry = new THREE.Mesh(new THREE.TetrahedronGeometry(50,1), this.materials[_.random(11)]);
         geometry.position.set(
-            _.random(50,750)* (Math.random() < 0.5 ? -1 : 1),
-            _.random(50,750)* (Math.random() < 0.5 ? -1 : 1),
-            _.random(50,750)* (Math.random() < 0.5 ? -1 : 1)
-        );
+            _.random(75,750)* (Math.random() < 0.5 ? -1 : 1),
+            _.random(75,750)* (Math.random() < 0.5 ? -1 : 1),
+            _.random(75,750)* (Math.random() < 0.5 ? -1 : 1)
+        )
         geometry.rotation.set(
             Math.random() * Math.PI * 2,
             Math.random() * Math.PI * 2,
             Math.random() * Math.PI * 2
-        );
-        return geometry;
+        )
+        return geometry
     }
 
     initPostprocessing() {
         this._renderer.autoClearColor = true;
         this.composer = new WAGNER.Composer(this._renderer);
         this.fxaaPass = new FXAAPass();
-        this.boxBlurPass = new BoxBlurPass(3, 3);
+        this.boxBlurPass = new BoxBlurPass(.1, .1);
         this.bloomPass = new MultiPassBloomPass({
-            blurAmount: 3,
+            blurAmount: .2,
             applyZoomBlur: true
         });
     }
@@ -94,6 +126,8 @@ class Main extends AbstractVRApplication  {
             this.cubes[i].rotation.y += 0.01 + ((i - this.cubes.length) * 0.00001);
             this.cubes[i].rotation.x += 0.01 + ((i - this.cubes.length) * 0.00001);
         }
+
+        // this.scene.remove(this.cubes.pop())
 
         if (this.params.usePostProcessing) {
             this.composer.reset();

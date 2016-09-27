@@ -45,8 +45,6 @@ class Main extends AbstractVRApplication {
           requestAnimationFrame(render);
           cube.rotation.x +=.01;
           cube.rotation.y += .04;
-
-          renderer.render(scene,camera);
         }
         render();
 

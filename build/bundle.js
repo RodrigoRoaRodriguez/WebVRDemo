@@ -43752,6 +43752,10 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+
+	var skyVert = "#define GLSLIFY 1\nvarying vec2 vUV;\n\nvoid main() {\n  vUV = uv;\n  vec4 pos = vec4(position, 1.0);\n  gl_Position = projectionMatrix * modelViewMatrix * pos;\n}\n";
+	var skyFrag = "#define GLSLIFY 1\nuniform sampler2D texture;\nvarying vec2 vUV;\n\nvoid main() {\n  vec4 sample = texture2D(texture, vUV);\n  gl_FragColor = vec4(sample.xyz, sample.w);\n}\n";
+
 	var Main = function (_AbstractVRApplicatio) {
 	    _inherits(Main, _AbstractVRApplicatio);
 
@@ -43760,7 +43764,28 @@
 	    function Main() {
 	        _classCallCheck(this, Main);
 
+	        //Add sky-dome.
+	        //TODO: Make a proper sky-box
 	        var _this = _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this));
+
+	        var geometry = new THREE.SphereGeometry(900, 0, 0);
+
+	        var texture = new THREE.TextureLoader().load('textures/bg.jpg');
+	        var uniforms = {
+	            texture: { type: 't', value: texture }
+	        };
+
+	        var material = new THREE.ShaderMaterial({
+	            uniforms: uniforms,
+	            vertexShader: skyVert,
+	            fragmentShader: skyFrag
+	        });
+
+	        var skyBox = new THREE.Mesh(geometry, material);
+	        skyBox.scale.set(-1, 1, 1);
+	        skyBox.eulerOrder = 'XZY';
+	        skyBox.renderDepth = 1000.0;
+	        _this.scene.add(skyBox);
 
 	        _this.cubes = [];
 
@@ -43771,18 +43796,25 @@
 	            useBloom: true
 	        };
 
-	        var light = new THREE.PointLight(0xFFFFFF, 1);
-	        light.position.copy(_this._camera.position);
-	        _this._scene.add(light);
+	        var lights = [new THREE.AmbientLight(0x202044), // soft white light
+	        new THREE.PointLight(0xffdd88, 1), new THREE.PointLight(0x88ccff, .5)];
+	        lights[1].position.set(-500, 990, 0);
+	        lights[2].position.set(500, 750, 0);
+
+	        lights.forEach(function (light) {
+	            return _this._scene.add(light);
+	        });
+
 	        //TODO: create 12 colored materials.
 	        _this.materials = [];
 	        for (var i = 0; i < 12; i++) {
 	            _this.materials.push(new THREE.MeshPhongMaterial({
 	                color: new THREE.Color('hsl(' + 30 * i + ', 90%, 65%)'),
 	                // shading:THREE.FlatShading,
-	                // opacity: 0.3,
-	                // transparent: true,
-	                shininess: 500
+	                blending: THREE.AdditiveBlending,
+	                opacity: 0.8,
+	                transparent: true,
+	                shininess: 170
 	            }));
 	        }
 
@@ -43790,9 +43822,9 @@
 	        for (var _i = 0; _i < 500; _i++) {
 	            model = _this.add3DModel();
 	            _this.cubes.push(model);
-	            _this._scene.add(model);
+	            _this.scene.add(model);
 	        }
-	        //model.position.set(0, 0, 50);
+
 	        _this.initPostprocessing();
 	        // this.initGui();
 
@@ -43805,8 +43837,8 @@
 	        key: 'add3DModel',
 	        value: function add3DModel() {
 	            //TODO: Replace with low poly wine glasses
-	            var geometry = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32), this.materials[_lodash2.default.random(12)]);
-	            geometry.position.set(Math.random() * 600 - 300, Math.random() * 600 - 300, Math.random() * 600 - 300);
+	            var geometry = new THREE.Mesh(new THREE.OctahedronGeometry(50, 2), this.materials[_lodash2.default.random(11)]);
+	            geometry.position.set(_lodash2.default.random(75, 750) * (Math.random() < 0.5 ? -1 : 1), _lodash2.default.random(75, 750) * (Math.random() < 0.5 ? -1 : 1), _lodash2.default.random(75, 750) * (Math.random() < 0.5 ? -1 : 1));
 	            geometry.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
 	            return geometry;
 	        }
@@ -43816,9 +43848,9 @@
 	            this._renderer.autoClearColor = true;
 	            this.composer = new _wagner2.default.Composer(this._renderer);
 	            this.fxaaPass = new _FXAAPass2.default();
-	            this.boxBlurPass = new _BoxBlurPass2.default(3, 3);
+	            this.boxBlurPass = new _BoxBlurPass2.default(.1, .1);
 	            this.bloomPass = new _MultiPassBloomPass2.default({
-	                blurAmount: 2,
+	                blurAmount: .2,
 	                applyZoomBlur: true
 	            });
 	        }
@@ -43840,6 +43872,8 @@
 	                this.cubes[i].rotation.y += 0.01 + (i - this.cubes.length) * 0.00001;
 	                this.cubes[i].rotation.x += 0.01 + (i - this.cubes.length) * 0.00001;
 	            }
+
+	            this.scene.remove(this.cubes.pop());
 
 	            if (this.params.usePostProcessing) {
 	                this.composer.reset();
@@ -43982,13 +44016,15 @@
 	    function AbstractVRApplication() {
 	        _classCallCheck(this, AbstractVRApplication);
 
-	        this._camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+	        //PerspectiveCamera( fov, aspect, near, far )
+	        this._camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 10, 1000);
 
 	        this._controls = new THREE.VRControls(this._camera);
 
 	        this._scene = new THREE.Scene();
 
 	        this._renderer = new THREE.WebGLRenderer();
+	        this._renderer.setClearColor(0xffffff, 0);
 	        this._renderer.setPixelRatio(window.devicePixelRatio);
 	        this._renderer.setSize(window.innerWidth, window.innerHeight);
 	        document.body.appendChild(this._renderer.domElement);
