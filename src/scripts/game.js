@@ -32,10 +32,10 @@ class Main extends AbstractVRApplication  {
           fragmentShader: skyFrag
         })
 
-        let skyBox = new THREE.Mesh(geometry, material);
-        skyBox.scale.set(-1, 1, 1);
-        skyBox.eulerOrder = 'XZY';
-        skyBox.renderDepth = 1000.0;
+        let skyBox = new THREE.Mesh(geometry, material)
+        skyBox.scale.set(-1, 1, 1)
+        skyBox.rotation.order = 'XZY'
+        skyBox.renderDepth = 1000.0
         this.scene.add(skyBox);
 
         this.cubes = [];
@@ -48,7 +48,7 @@ class Main extends AbstractVRApplication  {
         };
 
         var lights = [
-          new THREE.AmbientLight( 0x202044 ), // soft white light
+          // new THREE.AmbientLight( 0x202044 ), // soft white light
           new THREE.PointLight(0xffdd88, 1),
           new THREE.PointLight(0x88ccff, .5)
         ]
