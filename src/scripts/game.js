@@ -48,7 +48,7 @@ class Main extends AbstractVRApplication  {
         };
 
         var lights = [
-          // new THREE.AmbientLight( 0x202044 ), // soft white light
+          new THREE.AmbientLight( 0x202044 ), // soft white light
           new THREE.PointLight(0xffdd88, 1),
           new THREE.PointLight(0x88ccff, .5)
         ]
