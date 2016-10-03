@@ -3,4 +3,4 @@
 // import Main from 'scripts/mainVR'
 import Main from 'scripts/game'
 
-new Main();
+new Main()

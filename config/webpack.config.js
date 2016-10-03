@@ -9,7 +9,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 
 // Root app path
 let rootDir = path.resolve(__dirname, '..');
-let cleanDirectories = ['build', 'dist'];
+let cleanDirectories = ['build'];
 // Plugins configuration
 let plugins = [new webpack.NoErrorsPlugin()];
 
@@ -83,7 +83,8 @@ module.exports = function configuration(options) {
 
     if (prod) {
         suffix = 'prod';
-        outputPath = path.join(rootDir, 'dist');
+        outputPath = path.join(rootDir, 'docs');
+        cleanDirectories.push('docs')
         plugins.push(
             new webpack.optimize.UglifyJsPlugin({
                 warnings: false,
