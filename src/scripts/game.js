@@ -41,7 +41,7 @@ class Main extends AbstractVRApplication  {
         this.cubes = [];
 
         this.params = {
-            usePostProcessing: true,
+            usePostProcessing: false,
             useFXAA: true,
             useBlur: true,
             useBloom: true
@@ -57,7 +57,7 @@ class Main extends AbstractVRApplication  {
 
         lights.forEach(light =>this._scene.add(light))
 
-        //TODO: create 12 colored materials.
+        // TODO: create 12 colored materials.
         this.materials = []
 
         for (var i = 0; i < 12; i++) {
@@ -70,7 +70,7 @@ class Main extends AbstractVRApplication  {
         }
 
         let model;
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 100; i++) {
             model = this.add3DModel();
             this.cubes.push(model);
             this.scene.add(model);
