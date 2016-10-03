@@ -17,7 +17,7 @@ class Main extends AbstractApplication {
         this.params = {
             usePostProcessing: true,
             useFXAA: true,
-            useBlur: true,
+            useBlur: false,
             useBloom: true
         };
 

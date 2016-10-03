@@ -19,7 +19,7 @@ class Main extends AbstractVRApplication  {
         super();
         //Add sky-dome.
         //TODO: Make a proper sky-box
-        var geometry = new THREE.SphereGeometry(900, 0,0);
+        var geometry = new THREE.SphereGeometry(1000, 0,0);
 
         var texture = new THREE.TextureLoader().load( 'textures/bg.jpg' );
         var uniforms = {
@@ -31,7 +31,6 @@ class Main extends AbstractVRApplication  {
           vertexShader:   skyVert,
           fragmentShader: skyFrag
         })
-
 
         let skyBox = new THREE.Mesh(geometry, material);
         skyBox.scale.set(-1, 1, 1);
